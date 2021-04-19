@@ -58,8 +58,8 @@ public class TestBox extends Application {
         colors.heightProperty().bind(scene.heightProperty());
 
 
-        for (int i = 0; i < 2000; i++) {
-            Circle circle = new Circle(1000, Color.web("white", 0.01));
+        for (int i = 0; i < 2000; i++) {        //!!! aici pui cate cercuri vrei sa faca, momentan sunt 2000. cu cat pui mai mult cu atat streseaza mai mult gpu dar in anumita masura si cpu
+            Circle circle = new Circle(1000, Color.web("white", 0.01));     //Circle(radius,color/color properties) cu cat creste raza cercului creste si stresul pe gpu pana ajunge pe la raza 1000, orice valuare mai mare nu va provoca stres suplimentar
             circle.setStrokeType(StrokeType.OUTSIDE);
             circle.setStroke(Color.web("white", 0.16));
             circle.setStrokeWidth(4);
@@ -98,7 +98,7 @@ public class TestBox extends Application {
         AnimationTimer frameRateMeter = new AnimationTimer() {
 
             @Override
-            public void handle(long now) {
+            public void handle(long now) {      // aici primeste numarul mediu de fps si il afiseaza in terminal
                 System.out.println(String.format("Current frame rate: %.3f fps", getFPS()));
             }
         };
