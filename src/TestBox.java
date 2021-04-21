@@ -4,6 +4,7 @@ import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -17,6 +18,7 @@ import javafx.scene.paint.Stop;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.shape.StrokeType;
+import javafx.scene.text.Text;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 
@@ -26,6 +28,7 @@ public class TestBox  {
 
     private static PerformanceTracker tracker;
     public int k;
+    public int checkForStuck;
 
     public float getFPS () {
         float fps = tracker.getAverageFPS();
@@ -33,7 +36,7 @@ public class TestBox  {
         return fps;
     }
 
-    public void start(int power)  {
+    public int start(int power, Text score_field)  {
         Stage primaryStage=new Stage();
         Group root = new Group();
         Scene scene = new Scene(root, 1200, 800, Color.BLACK);
@@ -59,7 +62,7 @@ public class TestBox  {
         colors.heightProperty().bind(scene.heightProperty());
 
 
-        for (int i = 0; i < 100; i++) {        //!!! aici pui cate cercuri vrei sa faca, momentan sunt 2000. cu cat pui mai mult cu atat streseaza mai mult gpu dar in anumita masura si cpu
+        for (int i = 0; i < power; i++) {        //!!! aici pui cate cercuri vrei sa faca, momentan sunt 2000. cu cat pui mai mult cu atat streseaza mai mult gpu dar in anumita masura si cpu
             Circle circle = new Circle(900, Color.web("white", 0.01));     //Circle(radius,color/color properties) cu cat creste raza cercului creste si stresul pe gpu pana ajunge pe la raza 1000, orice valuare mai mare nu va provoca stres suplimentar
             circle.setStrokeType(StrokeType.OUTSIDE);
             circle.setStroke(Color.web("white", 0.16));
@@ -115,12 +118,16 @@ public class TestBox  {
                         System.out.println(String.format("Current frame rate: %.3f fps", f));
                         if(f==0){
                             k--;
-
+                            checkForStuck++;
+                        }else{
+                            checkForStuck=0;
                         }
-                if(k>=50){      //memory leak here, the stage is not collected by gc, leak is small but present,after using volume test for 20 times ram usage jumps from 80 mb to 120 mb    solution:unknown
+                if(k>=200||checkForStuck>20){      //memory leak here, pentru dificultati mici este neglijabil dar pentru testari dificile si consecutive ocupa mult ram    solution:unknown
                     primaryStage.close();
                     primaryStage.getScene().setRoot(new StackPane());
+                    score_field.setText(String.format("average fps: %.3f ", (total/k)));
                     this.stop();
+
 
 
 
@@ -131,14 +138,14 @@ public class TestBox  {
 
             }
         };
-        frameRateMeter.start();
+
             timeline.play();
-        return;
+        frameRateMeter.start();
 
 
 
+        return 0;
 
-       // timeline.play();
 
 
     }
