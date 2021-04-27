@@ -3,8 +3,6 @@ import javafx.animation.AnimationTimer;
 import javafx.animation.KeyFrame;
 import javafx.animation.KeyValue;
 import javafx.animation.Timeline;
-import javafx.application.Application;
-import javafx.application.Platform;
 import javafx.scene.Group;
 import javafx.scene.Node;
 import javafx.scene.Scene;
@@ -26,9 +24,9 @@ public class TestBox  {
 
 
 
-    private static PerformanceTracker tracker;
-    public int k;
-    public int checkForStuck;
+    private static PerformanceTracker tracker;      //tracks frames from animation
+    public int k;       //used to count frames
+    public int checkForStuck;       //if for some reason the animation is stuck this will count how many 0fps moments in a row they are, at 21 it will stop the test
 
     public float getFPS () {
         float fps = tracker.getAverageFPS();
@@ -37,14 +35,14 @@ public class TestBox  {
     }
 
     public int start(int power, Text score_field)  {
-        Stage primaryStage=new Stage();
+        Stage primaryStage=new Stage();     //construct the scene
         Group root = new Group();
         Scene scene = new Scene(root, 1200, 800, Color.BLACK);
         primaryStage.setScene(scene);
 
 
 
-        Group circles = new Group();
+        Group circles = new Group();    // stores the circles
 
 
         Rectangle colors = new Rectangle(scene.getWidth(), scene.getHeight(),
@@ -57,7 +55,7 @@ public class TestBox  {
                         new Stop(0.57, Color.web("#be4af7")),
                         new Stop(0.71, Color.web("#ed5fc2")),
                         new Stop(0.85, Color.web("#ef504c")),
-                        new Stop(1, Color.web("#f2660f")),}));
+                        new Stop(1, Color.web("#f2660f")),}));  //this makes a colorful background
         colors.widthProperty().bind(scene.widthProperty());
         colors.heightProperty().bind(scene.heightProperty());
 
@@ -68,9 +66,10 @@ public class TestBox  {
             circle.setStroke(Color.web("white", 0.16));
             circle.setStrokeWidth(4);
             circles.getChildren().add(circle);
+
         }
 
-        circles.setEffect(new BoxBlur(10, 10, 3));
+        circles.setEffect(new BoxBlur(10, 10, 3));      //makes the circle transparent (you would like to see the colors behind)
 
         Group blendModeGroup =
                 new Group(new Group(new Rectangle(scene.getWidth(), scene.getHeight(),
@@ -83,7 +82,7 @@ public class TestBox  {
 
 
             Timeline timeline = new Timeline();
-            for (Node circle : circles.getChildren()) {
+            for (Node circle : circles.getChildren()) {     //this will make the circles to move randomly
                 timeline.getKeyFrames().addAll(
                         new KeyFrame(Duration.ZERO, // set start position
                                 new KeyValue(circle.translateXProperty(), Math.random() * 1200),
@@ -122,7 +121,8 @@ public class TestBox  {
                         }else{
                             checkForStuck=0;
                         }
-                if(k>=200||checkForStuck>20){      //memory leak here, pentru dificultati mici este neglijabil dar pentru testari dificile si consecutive ocupa mult ram    solution:unknown
+                if(k>=100||checkForStuck>20){      //memory leak here, pentru dificultati mici este neglijabil dar pentru testari dificile si consecutive ocupa mult ram    solution:unknown
+
                     primaryStage.close();
                     primaryStage.getScene().setRoot(new StackPane());
                     score_field.setText(String.format("average fps: %.3f ", (total/k)));
