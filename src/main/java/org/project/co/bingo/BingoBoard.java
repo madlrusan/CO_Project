@@ -30,7 +30,6 @@ public class BingoBoard
                 board[i][j]= chooseRandomNumber(i, j, (j+1)*15+1);
             }
         }
-        System.out.println("board created");
     }
 
     public static int chooseRandomNumber(int i, int j, int max)
